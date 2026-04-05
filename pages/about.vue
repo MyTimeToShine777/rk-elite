@@ -17,7 +17,7 @@ useSeoMeta({
 
     <section class="site-section">
       <div class="layout-shell grid gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:items-start">
-        <div data-aos="fade-right">
+        <div data-reveal>
           <p class="eyebrow">Company Profile</p>
           <h2 class="section-title mt-5 text-[var(--rk-primary)]">Focused on durable structures and premium execution standards.</h2>
           <p class="mt-5 max-w-xl text-[var(--rk-text-muted)] leading-8">
@@ -96,7 +96,7 @@ useSeoMeta({
           </div>
         </div>
 
-        <div class="panel-dark blueprint-grid p-6 sm:p-8" data-aos="fade-left">
+        <div class="panel-dark blueprint-grid p-6 sm:p-8" data-reveal>
           <p class="technical-meta text-[var(--rk-tertiary)]">Values Matrix</p>
           <div class="mt-6 grid gap-4 sm:grid-cols-2">
             <div

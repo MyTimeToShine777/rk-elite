@@ -7,6 +7,11 @@ export type ServiceItem = {
   metric: string
 }
 
+export type FaqItem = {
+  question: string
+  answer: string
+}
+
 export const navigation = [
   { label: 'Home', to: '/' },
   { label: 'About', to: '/about' },
@@ -131,6 +136,25 @@ export const projectCategories = [
     title: 'Industrial Facilities',
     description: 'Warehouses, factories, industrial units, and storage buildings built for operational efficiency and long-term performance.',
     image: '/images/industrial-warehouse.jpg',
+  },
+]
+
+export const faqItems: FaqItem[] = [
+  {
+    question: 'What types of construction projects does RK Elite handle?',
+    answer: 'RK Elite handles residential homes, office and commercial spaces, industrial buildings, and complete turnkey construction projects across Chennai.',
+  },
+  {
+    question: 'Do you help with approvals, planning, and cost estimation?',
+    answer: 'Yes. The workflow covers approvals, planning and design, cost estimation, execution, progress visibility, and final delivery so the client does not need to coordinate multiple vendors separately.',
+  },
+  {
+    question: 'How do clients stay updated during construction?',
+    answer: 'Projects are managed with professional supervision and structured progress tracking, including CCTV-backed visibility where applicable, so milestones and site activity remain transparent throughout the build.',
+  },
+  {
+    question: 'Can I request a consultation before finalizing my project scope?',
+    answer: 'Yes. You can start with a consultation to discuss your site, budget, timeline, and construction goals before the project scope is finalized.',
   },
 ]
 

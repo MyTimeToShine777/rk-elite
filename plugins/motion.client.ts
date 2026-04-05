@@ -2,6 +2,9 @@ import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 
 let cleanupFns: Array<() => void> = []
+let setupMotionFrame = 0
+let lastMotionPath = ''
+let lastMotionSetupAt = 0
 
 function prefersReducedMotion() {
   return window.matchMedia('(prefers-reduced-motion: reduce)').matches
@@ -38,34 +41,33 @@ function killTweens() {
 }
 
 function selectGsapTargets(selector: string) {
-  return Array.from(document.querySelectorAll<HTMLElement>(selector)).filter(
-    element => !element.hasAttribute('data-aos'),
-  )
+  return Array.from(document.querySelectorAll<HTMLElement>(selector))
 }
 
 function resetAnimatedElements() {
   killTweens()
 
-  gsap.set(
-    [
-      '[data-reveal]',
-      '[data-process-card]',
-      '[data-page-hero-copy]',
-      '[data-page-hero-card]',
-      '[data-hero-visual]',
-      '[data-hero-title]',
-      '[data-command-card]',
-      '[data-command-metric]',
-      '[data-command-panel]',
-      '[data-blueprint-line]',
-      '[data-parallax]',
-      '[data-float]',
-      '[data-tilt]',
-      '[data-depth-layer]',
-      '[data-stagger] > *',
-    ],
-    { clearProps: 'all' },
-  )
+  const elements = Array.from(document.querySelectorAll<HTMLElement>([
+    '[data-reveal]',
+    '[data-process-card]',
+    '[data-page-hero-copy]',
+    '[data-page-hero-card]',
+    '[data-hero-visual]',
+    '[data-hero-title]',
+    '[data-command-card]',
+    '[data-command-metric]',
+    '[data-command-panel]',
+    '[data-blueprint-line]',
+    '[data-parallax]',
+    '[data-float]',
+    '[data-tilt]',
+    '[data-depth-layer]',
+    '[data-stagger] > *',
+  ].join(',')))
+
+  if (elements.length) {
+    gsap.set(elements, { clearProps: 'all' })
+  }
 }
 
 function animateCounters() {
@@ -98,54 +100,43 @@ function setupTiltCards() {
     return
   }
 
-  const candidates = new Set<HTMLElement>()
+  document.querySelectorAll<HTMLElement>('[data-tilt]').forEach((element) => {
+    gsap.set(element, {
+      transformPerspective: 1200,
+      transformOrigin: 'center',
+      force3D: true,
+    })
 
-  document.querySelectorAll<HTMLElement>('[data-tilt]').forEach(element => candidates.add(element))
-  document.querySelectorAll<HTMLElement>('.panel, .glass-panel, .project-shard').forEach((element) => {
-    const bounds = element.getBoundingClientRect()
-    const hasForm = Boolean(element.querySelector('form'))
-    const isCompactCard = bounds.width <= 560 && bounds.height <= 340
+    const rotateYTo = gsap.quickTo(element, 'rotateY', { duration: 0.3, ease: 'power2.out' })
+    const rotateXTo = gsap.quickTo(element, 'rotateX', { duration: 0.3, ease: 'power2.out' })
+    const zTo = gsap.quickTo(element, 'z', { duration: 0.35, ease: 'power2.out' })
 
-    if (isCompactCard && !hasForm) {
-      candidates.add(element)
-    }
-  })
-
-  candidates.forEach((element) => {
     const handleMove = (event: PointerEvent) => {
       const bounds = element.getBoundingClientRect()
       const offsetX = (event.clientX - bounds.left) / bounds.width - 0.5
       const offsetY = (event.clientY - bounds.top) / bounds.height - 0.5
 
-      gsap.to(element, {
-        rotateY: offsetX * 10,
-        rotateX: offsetY * -10,
-        z: 18,
-        transformPerspective: 1200,
-        transformOrigin: 'center',
-        duration: 0.35,
-        ease: 'power2.out',
-      })
+      rotateYTo(offsetX * 8)
+      rotateXTo(offsetY * -8)
+      zTo(14)
     }
 
     const resetTilt = () => {
-      gsap.to(element, {
-        rotateY: 0,
-        rotateX: 0,
-        z: 0,
-        duration: 0.45,
-        ease: 'power3.out',
-      })
+      rotateYTo(0)
+      rotateXTo(0)
+      zTo(0)
     }
 
     element.addEventListener('pointermove', handleMove)
     element.addEventListener('pointerleave', resetTilt)
+    element.addEventListener('pointercancel', resetTilt)
     element.addEventListener('blur', resetTilt)
 
     cleanupFns.push(() => {
       resetTilt()
       element.removeEventListener('pointermove', handleMove)
       element.removeEventListener('pointerleave', resetTilt)
+      element.removeEventListener('pointercancel', resetTilt)
       element.removeEventListener('blur', resetTilt)
     })
   })
@@ -185,35 +176,32 @@ function setupMagneticActions() {
   }
 
   document.querySelectorAll<HTMLElement>('.button-primary, .button-secondary').forEach((element) => {
+    const xTo = gsap.quickTo(element, 'x', { duration: 0.22, ease: 'power2.out' })
+    const yTo = gsap.quickTo(element, 'y', { duration: 0.22, ease: 'power2.out' })
+
     const handleMove = (event: PointerEvent) => {
       const bounds = element.getBoundingClientRect()
       const offsetX = (event.clientX - bounds.left) / bounds.width - 0.5
       const offsetY = (event.clientY - bounds.top) / bounds.height - 0.5
 
-      gsap.to(element, {
-        x: offsetX * 10,
-        y: offsetY * 8 - 2,
-        duration: 0.25,
-        ease: 'power2.out',
-      })
+      xTo(offsetX * 8)
+      yTo(offsetY * 6 - 2)
     }
 
     const handleLeave = () => {
-      gsap.to(element, {
-        x: 0,
-        y: 0,
-        duration: 0.35,
-        ease: 'power3.out',
-      })
+      xTo(0)
+      yTo(0)
     }
 
     element.addEventListener('pointermove', handleMove)
     element.addEventListener('pointerleave', handleLeave)
+    element.addEventListener('pointercancel', handleLeave)
 
     cleanupFns.push(() => {
       handleLeave()
       element.removeEventListener('pointermove', handleMove)
       element.removeEventListener('pointerleave', handleLeave)
+      element.removeEventListener('pointercancel', handleLeave)
     })
   })
 }
@@ -225,63 +213,64 @@ function setupDepthScenes() {
 
   document.querySelectorAll<HTMLElement>('[data-depth-scene]').forEach((scene) => {
     const layers = Array.from(scene.querySelectorAll<HTMLElement>('[data-depth-layer]'))
+    const rotateYTo = gsap.quickTo(scene, 'rotateY', { duration: 0.45, ease: 'power3.out' })
+    const rotateXTo = gsap.quickTo(scene, 'rotateX', { duration: 0.45, ease: 'power3.out' })
+
+    gsap.set(scene, {
+      transformPerspective: 1800,
+      transformOrigin: 'center center',
+      force3D: true,
+    })
+
+    const layerSetters = layers.map(layer => ({
+      depth: Number(layer.dataset.depthLayer ?? '0.12'),
+      xTo: gsap.quickTo(layer, 'x', { duration: 0.45, ease: 'power3.out' }),
+      yTo: gsap.quickTo(layer, 'y', { duration: 0.45, ease: 'power3.out' }),
+      zTo: gsap.quickTo(layer, 'z', { duration: 0.45, ease: 'power3.out' }),
+      rotateYTo: gsap.quickTo(layer, 'rotateY', { duration: 0.45, ease: 'power3.out' }),
+      rotateXTo: gsap.quickTo(layer, 'rotateX', { duration: 0.45, ease: 'power3.out' }),
+    }))
 
     const handleMove = (event: PointerEvent) => {
       const bounds = scene.getBoundingClientRect()
       const offsetX = (event.clientX - bounds.left) / bounds.width - 0.5
       const offsetY = (event.clientY - bounds.top) / bounds.height - 0.5
 
-      gsap.to(scene, {
-        rotateY: offsetX * 5,
-        rotateX: offsetY * -4,
-        transformPerspective: 1800,
-        transformOrigin: 'center center',
-        duration: 0.45,
-        ease: 'power3.out',
-      })
+      rotateYTo(offsetX * 5)
+      rotateXTo(offsetY * -4)
 
-      layers.forEach((layer) => {
-        const depth = Number(layer.dataset.depthLayer ?? '0.12')
-        gsap.to(layer, {
-          x: offsetX * 55 * depth,
-          y: offsetY * 42 * depth,
-          z: 80 * depth,
-          rotateY: offsetX * 10 * depth,
-          rotateX: offsetY * -8 * depth,
-          duration: 0.45,
-          ease: 'power3.out',
-        })
+      layers.forEach((_, index) => {
+        const layer = layerSetters[index]
+        layer.xTo(offsetX * 42 * layer.depth)
+        layer.yTo(offsetY * 32 * layer.depth)
+        layer.zTo(56 * layer.depth)
+        layer.rotateYTo(offsetX * 8 * layer.depth)
+        layer.rotateXTo(offsetY * -6 * layer.depth)
       })
     }
 
     const handleLeave = () => {
-      gsap.to(scene, {
-        rotateY: 0,
-        rotateX: 0,
-        duration: 0.55,
-        ease: 'power3.out',
-      })
+      rotateYTo(0)
+      rotateXTo(0)
 
-      layers.forEach((layer) => {
-        gsap.to(layer, {
-          x: 0,
-          y: 0,
-          z: 0,
-          rotateY: 0,
-          rotateX: 0,
-          duration: 0.55,
-          ease: 'power3.out',
-        })
+      layerSetters.forEach((layer) => {
+        layer.xTo(0)
+        layer.yTo(0)
+        layer.zTo(0)
+        layer.rotateYTo(0)
+        layer.rotateXTo(0)
       })
     }
 
     scene.addEventListener('pointermove', handleMove)
     scene.addEventListener('pointerleave', handleLeave)
+    scene.addEventListener('pointercancel', handleLeave)
 
     cleanupFns.push(() => {
       handleLeave()
       scene.removeEventListener('pointermove', handleMove)
       scene.removeEventListener('pointerleave', handleLeave)
+      scene.removeEventListener('pointercancel', handleLeave)
     })
   })
 }
@@ -298,9 +287,12 @@ function setupMotion() {
   const heroCopy = document.querySelector('[data-hero-copy]')
   const heroVisual = document.querySelector('[data-hero-visual]')
   const heroTitle = document.querySelector('[data-hero-title]')
+  const heroCopyChildren = heroCopy instanceof HTMLElement
+    ? Array.from(heroCopy.children).filter(child => child !== heroTitle)
+    : []
 
-  if (heroCopy) {
-    gsap.from(heroCopy.children, {
+  if (heroCopyChildren.length) {
+    gsap.from(heroCopyChildren, {
       y: 32,
       opacity: 0,
       duration: 0.9,
@@ -451,9 +443,7 @@ function setupMotion() {
   })
 
   document.querySelectorAll<HTMLElement>('[data-stagger]').forEach((group) => {
-    const children = Array.from(group.children).filter(
-      child => !(child instanceof HTMLElement) || !child.hasAttribute('data-aos'),
-    )
+    const children = Array.from(group.children)
 
     if (!children.length) {
       return
@@ -542,7 +532,7 @@ function setupMotion() {
 
   document.querySelectorAll<HTMLElement>('[data-float]').forEach((element, index) => {
     gsap.to(element, {
-      y: index % 2 === 0 ? -12 : 12,
+      yPercent: index % 2 === 0 ? -4 : 4,
       duration: 4 + index * 0.6,
       repeat: -1,
       yoyo: true,
@@ -558,18 +548,34 @@ function setupMotion() {
   ScrollTrigger.refresh()
 }
 
+function queueMotionSetup() {
+  const currentPath = `${window.location.pathname}${window.location.search}${window.location.hash}`
+  const now = performance.now()
+
+  if (currentPath === lastMotionPath && now - lastMotionSetupAt < 180) {
+    return
+  }
+
+  if (setupMotionFrame) {
+    cancelAnimationFrame(setupMotionFrame)
+  }
+
+  setupMotionFrame = requestAnimationFrame(() => {
+    setupMotionFrame = 0
+    lastMotionPath = currentPath
+    lastMotionSetupAt = performance.now()
+    setupMotion()
+  })
+}
+
 export default defineNuxtPlugin((nuxtApp) => {
   gsap.registerPlugin(ScrollTrigger)
 
   nuxtApp.hook('app:mounted', () => {
-    requestAnimationFrame(() => {
-      setupMotion()
-    })
+    queueMotionSetup()
   })
 
   nuxtApp.hook('page:finish', () => {
-    requestAnimationFrame(() => {
-      setupMotion()
-    })
+    queueMotionSetup()
   })
 })

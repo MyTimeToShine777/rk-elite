@@ -53,7 +53,7 @@ const executionPillars = [
           </article>
         </div>
 
-        <div class="mt-8 panel blueprint-grid p-8 sm:p-10" data-aos="fade-up">
+        <div class="mt-8 panel blueprint-grid p-8 sm:p-10" data-reveal>
           <SectionHeader
             eyebrow="Execution Pillars"
             title="Project quality expressed through capability, workflow, and supervision."

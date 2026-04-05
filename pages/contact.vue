@@ -24,7 +24,7 @@ const projectOptions = [
 
     <section class="site-section">
       <div class="layout-shell grid gap-8 lg:grid-cols-[0.78fr_1.22fr]">
-        <div class="panel-dark blueprint-grid p-8" data-aos="fade-right" data-tilt>
+        <div class="panel-dark blueprint-grid p-8" data-reveal data-tilt>
           <p class="eyebrow">Contact Details</p>
           <h2 class="mt-5 font-heading text-4xl font-bold uppercase tracking-[-0.05em] text-[var(--rk-primary)]">RK Elite Construction</h2>
           <div class="mt-8 space-y-6 text-[var(--rk-text-muted)]">
@@ -49,7 +49,7 @@ const projectOptions = [
           :project-options="projectOptions"
           :show-budget="true"
           dark
-          data-aos="fade-left"
+          data-reveal
         />
       </div>
     </section>

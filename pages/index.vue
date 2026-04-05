@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { commandMetrics, contactDetails, heroStats, processSteps, projectCategories, services, strengths, whyChooseUs } from '~/data/site'
+import { commandMetrics, contactDetails, faqItems, heroStats, processSteps, projectCategories, services, strengths, whyChooseUs } from '~/data/site'
 
 useSeoMeta({
   title: 'Premium Construction in Chennai',
@@ -465,10 +465,50 @@ const feedStats = [
       </div>
     </section>
 
+    <section class="site-section pt-0">
+      <div class="layout-shell grid gap-10 lg:grid-cols-[0.86fr_1.14fr] lg:items-start">
+        <div data-reveal>
+          <SectionHeader
+            eyebrow="Frequently Asked Questions"
+            title="Straight answers before your project moves into planning and execution."
+            description="These are the questions most clients need cleared up before they commit to a residential, commercial, industrial, or turnkey build." 
+          />
+          <div class="mt-8 panel p-6 sm:p-7">
+            <p class="technical-meta text-[var(--rk-tertiary)]">Need a direct discussion instead?</p>
+            <p class="mt-4 max-w-xl text-sm leading-8 text-[var(--rk-text-muted)]">
+              Talk to the team about approvals, costing, timelines, or the right construction path for your site before moving ahead.
+            </p>
+            <div class="mt-6 flex flex-col gap-3 text-sm leading-7 text-[var(--rk-text-muted)]">
+              <a :href="`tel:${contactDetails.phone}`" class="font-heading text-base font-bold tracking-[0.08em] text-[var(--rk-primary)]">{{ contactDetails.phone }}</a>
+              <p>{{ contactDetails.address }}</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid gap-4">
+          <details
+            v-for="(item, index) in faqItems"
+            :key="item.question"
+            class="faq-item panel"
+            :open="index === 0"
+            data-reveal
+          >
+            <summary class="faq-trigger">
+              <span class="pr-4">{{ item.question }}</span>
+              <span class="faq-icon" aria-hidden="true">+</span>
+            </summary>
+            <div class="faq-answer">
+              <p>{{ item.answer }}</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
     <section class="site-section pb-20">
       <div class="layout-shell">
         <div class="grid gap-10 lg:grid-cols-[0.85fr_1.15fr] lg:items-start">
-          <div data-aos="fade-right">
+          <div data-reveal>
             <p class="eyebrow">Planning to Build Your Dream Project?</p>
             <h2 class="section-title mt-5 text-[var(--rk-primary)]">Get expert guidance from our construction team.</h2>
             <p class="mt-5 max-w-xl text-[var(--rk-text-muted)] leading-8">
@@ -501,7 +541,7 @@ const feedStats = [
             subtitle="Fill in your details and our team will get in touch to discuss your project requirements."
             :project-options="projectOptions"
             dark
-            data-aos="fade-left"
+            data-reveal
           />
         </div>
       </div>
